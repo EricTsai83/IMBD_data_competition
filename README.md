@@ -16,3 +16,5 @@ https://www.kaggle.com/code/reenanitr01/multi-output-regression-techniques/noteb
 https://machinelearningmastery.com/modeling-pipeline-optimization-with-scikit-learn/
 
 https://scikit-learn.org/stable/auto_examples/neighbors/plot_nca_classification.html#sphx-glr-auto-examples-neighbors-plot-nca-classification-py
+
+https://inria.github.io/scikit-learn-mooc/python_scripts/03_categorical_pipeline_column_transformer.html
