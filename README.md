@@ -18,3 +18,6 @@ https://machinelearningmastery.com/modeling-pipeline-optimization-with-scikit-le
 https://scikit-learn.org/stable/auto_examples/neighbors/plot_nca_classification.html#sphx-glr-auto-examples-neighbors-plot-nca-classification-py
 
 https://inria.github.io/scikit-learn-mooc/python_scripts/03_categorical_pipeline_column_transformer.html
+
+#### Discretization
+https://towardsdatascience.com/an-introduction-to-discretization-in-data-science-55ef8c9775a2
