@@ -27,3 +27,7 @@ https://www.kaggle.com/code/tilii7/feature-discretization-less-is-better/noteboo
 
 #### Outlier
 https://erickleppen.medium.com/how-to-find-outliers-in-data-using-python-d39366ef262b
+
+
+#### Preparing Numeric Data
+https://www.kaggle.com/code/hamelg/python-for-data-16-preparing-numeric-data/notebook
