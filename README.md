@@ -12,6 +12,12 @@ https://www.kaggle.com/general/228430
 
 https://www.kaggle.com/code/reenanitr01/multi-output-regression-techniques/notebook
 
+https://scikit-learn.org/stable/modules/generated/sklearn.multioutput.MultiOutputRegressor.html
+
+https://scikit-learn.org/stable/modules/generated/sklearn.multioutput.RegressorChain.html
+
+https://systemallica.github.io/morfist/
+
 #### pipeline
 https://machinelearningmastery.com/modeling-pipeline-optimization-with-scikit-learn/
 
