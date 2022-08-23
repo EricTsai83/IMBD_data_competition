@@ -26,7 +26,7 @@ https://scikit-learn.org/stable/modules/tree.html#tree-multioutput
 
 https://github.com/krishnaik06/Develop-Multi-Output-Regression-Models
 
-##### 不錯看一下
+##### [不錯看一下](https://www.youtube.com/watch?v=NMGsIsR7gR4)
 https://github.com/katanaml/sample-apps/blob/master/04/multi-output-model.ipynb
 
 #### pipeline
