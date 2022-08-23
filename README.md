@@ -24,6 +24,8 @@ https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression_multiout
 
 https://scikit-learn.org/stable/modules/tree.html#tree-multioutput
 
+https://github.com/krishnaik06/Develop-Multi-Output-Regression-Models
+
 #### pipeline
 https://machinelearningmastery.com/modeling-pipeline-optimization-with-scikit-learn/
 
