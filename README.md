@@ -18,6 +18,8 @@ https://scikit-learn.org/stable/modules/generated/sklearn.multioutput.RegressorC
 
 https://systemallica.github.io/morfist/
 
+https://scikit-multiflow.readthedocs.io/en/stable/api/generated/skmultiflow.meta.MultiOutputLearner.html
+
 #### pipeline
 https://machinelearningmastery.com/modeling-pipeline-optimization-with-scikit-learn/
 
