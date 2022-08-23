@@ -20,6 +20,10 @@ https://systemallica.github.io/morfist/
 
 https://scikit-multiflow.readthedocs.io/en/stable/api/generated/skmultiflow.meta.MultiOutputLearner.html
 
+https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression_multioutput.html#sphx-glr-auto-examples-tree-plot-tree-regression-multioutput-py
+
+https://scikit-learn.org/stable/modules/tree.html#tree-multioutput
+
 #### pipeline
 https://machinelearningmastery.com/modeling-pipeline-optimization-with-scikit-learn/
 
