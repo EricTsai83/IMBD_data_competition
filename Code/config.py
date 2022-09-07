@@ -100,13 +100,16 @@ Ada_params = {'sensor_point5_i_value': {'learning_rate': 0.5, 'n_estimators': 50
               'sensor_point10_i_value': {'learning_rate': 0.5, 'n_estimators': 300}}
 
 
-
+# 依序跑模型最佳順序
 order_list = [5, 3, 2, 1, 4, 0]
 
+# 使用的模型list
 model_name = ['XGB','Ridge','Lasso','Ada','KN']
 
+# Y變數選取
 Y_variable = 'sensor_point5_i_value'
 
+# 放入超參數後的model
 model_info = {'Ridge':{'CV':{Ridgecv},
                        'Model': Ridge(**ast.literal_eval(f'{Ridge_params}')[f'{Y_variable}'])
                       },
