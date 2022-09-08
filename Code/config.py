@@ -16,6 +16,7 @@ from sklearn.linear_model import MultiTaskLassoCV
 from sklearn.model_selection import GridSearchCV
 import numpy as np
 import ast
+from catboost import CatBoostRegressor
 # ------------------------ Model ------------------------
 
 # Gridsearch超參數CV
@@ -63,6 +64,17 @@ grid_search_Ada = GridSearchCV(AdaBoostRegressor(),
                                cv = 5
                               )
 
+grid_search_Cat = GridSearchCV(CatBoostRegressor(),
+                               param_grid = {'iterations': [100, 150, 200],
+                                             'learning_rate': [0.03, 0.1],
+                                             'depth': [2, 4, 6, 8],
+                                             'l2_leaf_reg': [0.2, 0.5, 1, 3]},
+                               n_jobs = -1,
+                               scoring = 'neg_root_mean_squared_error',
+                               cv = 5
+                              )
+
+
 # 模型超參數
 Lasso_params = {'sensor_point5_i_value': {'alpha': 1.0}, 
                 'sensor_point6_i_value': {'alpha': 5.0}, 
@@ -99,6 +111,9 @@ Ada_params = {'sensor_point5_i_value': {'learning_rate': 0.5, 'n_estimators': 50
               'sensor_point9_i_value': {'learning_rate': 0.2, 'n_estimators': 50}, 
               'sensor_point10_i_value': {'learning_rate': 0.5, 'n_estimators': 300}}
 
+# Cat_params = {
+
+
 
 # 依序跑模型最佳順序
 order_list = [5, 3, 2, 1, 4, 0]
@@ -128,7 +143,9 @@ model_info = {'Ridge':{'CV':{Ridgecv},
               
               'Ada':{'CV':{grid_search_Ada},
                      'Model': AdaBoostRegressor(**ast.literal_eval(f'{Ada_params}')[f'{Y_variable}'])
-                    }
+                    },
+              
+              
              }
 
 
