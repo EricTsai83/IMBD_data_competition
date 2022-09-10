@@ -125,6 +125,10 @@ model_name = ['Ridge','Lasso','XGB','KN','Ada','Cat']
 # Y變數選取
 Y_variable = 'sensor_point6_i_value'
 
+data_y_col = ['sensor_point5_i_value','sensor_point6_i_value','sensor_point7_i_value',\
+              'sensor_point8_i_value','sensor_point9_i_value','sensor_point10_i_value']
+
+
 # 放入超參數後的model
 model_info = {'Ridge':{'CV':{Ridgecv},
                        'Model': Ridge(**ast.literal_eval(f'{Ridge_params}')[f'{Y_variable}'])
@@ -150,6 +154,38 @@ model_info = {'Ridge':{'CV':{Ridgecv},
                      'Model': CatBoostRegressor(**ast.literal_eval(f'{Cat_params}')[f'{Y_variable}'])
                     },
              }
+
+
+model_list = [Pipeline([('poly',PolynomialFeatures(degree = 2)),
+                        ('std_scaler', StandardScaler()),
+                        ('Ada', AdaBoostRegressor(**ast.literal_eval(f'{Ada_params}')[ast.literal_eval(f'{data_y_col}')[0]]))
+                        ]),
+                       
+              Pipeline([('poly',PolynomialFeatures(degree = 2)),
+                        ('std_scaler', StandardScaler()),
+                        ('xgb_reg', xgb.XGBRegressor(**ast.literal_eval(f'{XGB_params}')[ast.literal_eval(f'{data_y_col}')[1]]))
+                        ]),
+              
+              Pipeline([('poly',PolynomialFeatures(degree = 2)),
+                        ('std_scaler', StandardScaler()),
+                        ('xgb_reg', xgb.XGBRegressor(**ast.literal_eval(f'{XGB_params}')[ast.literal_eval(f'{data_y_col}')[2]]))
+                        ]),
+              
+              Pipeline([('poly',PolynomialFeatures(degree = 2)),
+                        ('std_scaler', StandardScaler()),
+                        ('Ada', AdaBoostRegressor(**ast.literal_eval(f'{Ada_params}')[ast.literal_eval(f'{data_y_col}')[3]]))
+                        ]),
+               
+              Pipeline([('poly',PolynomialFeatures(degree = 2)),
+                        ('std_scaler', StandardScaler()),
+                        ('KNR', KNeighborsRegressor(**ast.literal_eval(f'{KN_params}')[ast.literal_eval(f'{data_y_col}')[4]]))
+                        ]),
+              
+              Pipeline([('poly',PolynomialFeatures(degree = 2)),
+                        ('std_scaler', StandardScaler()),
+                        ('Ada', AdaBoostRegressor(**ast.literal_eval(f'{Ada_params}')[ast.literal_eval(f'{data_y_col}')[5]]))
+                        ])
+              ]
 
 
 # -
