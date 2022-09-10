@@ -21,24 +21,16 @@ from catboost import CatBoostRegressor
 
 # Gridsearch超參數CV
 
-Lassocv = LassoCV(alphas = [0.01,0.1,0.5,1,5,7,10,30,100,500], cv = 5, max_iter = 10000)
-
 Ridgecv = RidgeCV(alphas = [0.01,0.1,0.5,1,5,7,10,30,100,500], cv = 5)
 
-
-gbm_param_grid = {'learning_rate':np.array([0.2]),
-                  'n_estimators':np.array([30, 100, 200, 500]),
-                  'max_depth':np.array([3, 5, 13, 20]),
-                  'min_child_weight':np.array([3, 10])
-                  }
-
-
+Lassocv = LassoCV(alphas = [0.01,0.1,0.5,1,5,7,10,30,100,500], cv = 5, max_iter = 10000)
 
 grid_search_xgbm = GridSearchCV(xgb.XGBRegressor(),
                                   param_grid = {'learning_rate':np.array([0.2]),
                                                 'n_estimators':np.array([30, 100, 200, 500]),
                                                 'max_depth':np.array([3, 5, 13, 20]),
-                                                'min_child_weight':np.array([3, 10])
+                                                'min_child_weight':np.array([3, 10]),
+                                                'random_state':[1]
                                                 },
                                   n_jobs = -1,
                                   scoring = 'neg_root_mean_squared_error',
@@ -57,7 +49,8 @@ grid_search_KN = GridSearchCV(KNeighborsRegressor(),
 
 grid_search_Ada = GridSearchCV(AdaBoostRegressor(),
                                param_grid = {'n_estimators':np.array([50, 300, 500]),
-                                             'learning_rate':np.array([0.2, 0.5])
+                                             'learning_rate':np.array([0.2, 0.5]),
+                                             'random_state':[1]
                                              },
                                n_jobs = -1,
                                scoring = 'neg_root_mean_squared_error',
@@ -65,10 +58,13 @@ grid_search_Ada = GridSearchCV(AdaBoostRegressor(),
                               )
 
 grid_search_Cat = GridSearchCV(CatBoostRegressor(),
-                               param_grid = {'iterations': [100, 150, 200],
+                               param_grid = {'iterations': [100, 200],
                                              'learning_rate': [0.03, 0.1],
-                                             'depth': [2, 4, 6, 8],
-                                             'l2_leaf_reg': [0.2, 0.5, 1, 3]},
+                                             'depth': [2, 5, 8],
+                                             'l2_leaf_reg': [0.5, 3],
+                                             'eval_metric':['RMSE'],
+                                             'random_state':[1]
+                                            },
                                n_jobs = -1,
                                scoring = 'neg_root_mean_squared_error',
                                cv = 5
@@ -90,12 +86,12 @@ Ridge_params = {'sensor_point5_i_value': {'alpha': 500.0},
                 'sensor_point9_i_value': {'alpha': 500.0}, 
                 'sensor_point10_i_value': {'alpha': 500.0}}
 
-XGB_params = {'sensor_point5_i_value': {'learning_rate': 0.2, 'max_depth': 5, 'min_child_weight': 10, 'n_estimators': 30}, 
-              'sensor_point6_i_value': {'learning_rate': 0.2, 'max_depth': 20, 'min_child_weight': 10, 'n_estimators': 30}, 
-              'sensor_point7_i_value': {'learning_rate': 0.2, 'max_depth': 13, 'min_child_weight': 10, 'n_estimators': 30}, 
-              'sensor_point8_i_value': {'learning_rate': 0.2, 'max_depth': 20, 'min_child_weight': 3, 'n_estimators': 500}, 
-              'sensor_point9_i_value': {'learning_rate': 0.2, 'max_depth': 20, 'min_child_weight': 3, 'n_estimators': 30}, 
-              'sensor_point10_i_value': {'learning_rate': 0.2, 'max_depth': 5, 'min_child_weight': 10, 'n_estimators': 30}}
+XGB_params = {'sensor_point5_i_value': {'learning_rate': 0.2, 'max_depth': 5, 'min_child_weight': 10, 'n_estimators': 30, 'random_state': 1}, 
+              'sensor_point6_i_value': {'learning_rate': 0.2, 'max_depth': 20, 'min_child_weight': 10, 'n_estimators': 30, 'random_state': 1}, 
+              'sensor_point7_i_value': {'learning_rate': 0.2, 'max_depth': 13, 'min_child_weight': 10, 'n_estimators': 30, 'random_state': 1}, 
+              'sensor_point8_i_value': {'learning_rate': 0.2, 'max_depth': 20, 'min_child_weight': 3, 'n_estimators': 500, 'random_state': 1}, 
+              'sensor_point9_i_value': {'learning_rate': 0.2, 'max_depth': 20, 'min_child_weight': 3, 'n_estimators': 30, 'random_state': 1}, 
+              'sensor_point10_i_value': {'learning_rate': 0.2, 'max_depth': 5, 'min_child_weight': 10, 'n_estimators': 30, 'random_state': 1}}
 
 KN_params = {'sensor_point5_i_value': {'leaf_size': 20, 'n_neighbors': 7, 'weights': 'uniform'}, 
              'sensor_point6_i_value': {'leaf_size': 20, 'n_neighbors': 7, 'weights': 'distance'}, 
@@ -104,14 +100,19 @@ KN_params = {'sensor_point5_i_value': {'leaf_size': 20, 'n_neighbors': 7, 'weigh
              'sensor_point9_i_value': {'leaf_size': 20, 'n_neighbors': 7, 'weights': 'distance'}, 
              'sensor_point10_i_value': {'leaf_size': 20, 'n_neighbors': 7, 'weights': 'distance'}}
 
-Ada_params = {'sensor_point5_i_value': {'learning_rate': 0.5, 'n_estimators': 500}, 
-              'sensor_point6_i_value': {'learning_rate': 0.2, 'n_estimators': 300}, 
-              'sensor_point7_i_value': {'learning_rate': 0.2, 'n_estimators': 300}, 
-              'sensor_point8_i_value': {'learning_rate': 0.2, 'n_estimators': 50}, 
-              'sensor_point9_i_value': {'learning_rate': 0.2, 'n_estimators': 50}, 
-              'sensor_point10_i_value': {'learning_rate': 0.5, 'n_estimators': 300}}
+Ada_params = {'sensor_point5_i_value': {'learning_rate': 0.2, 'n_estimators': 50, 'random_state': 1}, 
+              'sensor_point6_i_value': {'learning_rate': 0.5, 'n_estimators': 50, 'random_state': 1}, 
+              'sensor_point7_i_value': {'learning_rate': 0.5, 'n_estimators': 50, 'random_state': 1}, 
+              'sensor_point8_i_value': {'learning_rate': 0.2, 'n_estimators': 50, 'random_state': 1}, 
+              'sensor_point9_i_value': {'learning_rate': 0.5, 'n_estimators': 50, 'random_state': 1}, 
+              'sensor_point10_i_value': {'learning_rate': 0.5, 'n_estimators': 50, 'random_state': 1}}
 
-# Cat_params = {
+Cat_params = {'sensor_point5_i_value': {'depth': 5, 'eval_metric': 'RMSE', 'iterations': 100, 'l2_leaf_reg': 0.5, 'learning_rate': 0.1, 'random_state': 1}, 
+              'sensor_point6_i_value': {'depth': 5, 'eval_metric': 'RMSE', 'iterations': 200, 'l2_leaf_reg': 0.5, 'learning_rate': 0.1, 'random_state': 1}, 
+              'sensor_point7_i_value': {'depth': 2, 'eval_metric': 'RMSE', 'iterations': 200, 'l2_leaf_reg': 0.5, 'learning_rate': 0.1, 'random_state': 1}, 
+              'sensor_point8_i_value': {'depth': 8, 'eval_metric': 'RMSE', 'iterations': 200, 'l2_leaf_reg': 3, 'learning_rate': 0.03, 'random_state': 1}, 
+              'sensor_point9_i_value': {'depth': 8, 'eval_metric': 'RMSE', 'iterations': 100, 'l2_leaf_reg': 3, 'learning_rate': 0.03, 'random_state': 1}, 
+              'sensor_point10_i_value': {'depth': 8, 'eval_metric': 'RMSE', 'iterations': 200, 'l2_leaf_reg': 3, 'learning_rate': 0.03, 'random_state': 1}}
 
 
 
@@ -119,10 +120,10 @@ Ada_params = {'sensor_point5_i_value': {'learning_rate': 0.5, 'n_estimators': 50
 order_list = [5, 3, 2, 1, 4, 0]
 
 # 使用的模型list
-model_name = ['XGB','Ridge','Lasso','Ada','KN']
+model_name = ['Ridge','Lasso','XGB','KN','Ada','Cat']
 
 # Y變數選取
-Y_variable = 'sensor_point5_i_value'
+Y_variable = 'sensor_point6_i_value'
 
 # 放入超參數後的model
 model_info = {'Ridge':{'CV':{Ridgecv},
@@ -145,7 +146,9 @@ model_info = {'Ridge':{'CV':{Ridgecv},
                      'Model': AdaBoostRegressor(**ast.literal_eval(f'{Ada_params}')[f'{Y_variable}'])
                     },
               
-              
+              'Cat':{'CV':{grid_search_Cat},
+                     'Model': CatBoostRegressor(**ast.literal_eval(f'{Cat_params}')[f'{Y_variable}'])
+                    },
              }
 
 
