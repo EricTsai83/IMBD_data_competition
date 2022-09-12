@@ -1,3 +1,5 @@
+# utils 裡的資料沒有放(補一下
+
 # IMBD data competition
 https://imbd2022.thu.edu.tw/
 
