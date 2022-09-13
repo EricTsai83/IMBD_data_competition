@@ -41,7 +41,8 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.decomposition import PCA
 # Standardization
 from sklearn import preprocessing
-
+# warnings
+import warnings
 
 
 class DealWithMissingValue:
@@ -75,6 +76,12 @@ class DealWithMissingValue:
         return res
         
     def iterative_imputer(self, method: str, train: bool) -> pd.DataFrame:
+        '''
+        Iterative imputation of the missing values:
+        A strategy for imputing missing values by modeling each feature with
+        missing values as a function of other features in a round-robin fashion.
+        
+        '''
         model_dic = {
             'linear_regression': LinearRegression(),
             'bayesian_ridge': BayesianRidge(),
@@ -101,6 +108,12 @@ class DealWithMissingValue:
     
     
 class VariableTransformation:
+    '''
+    method:
+        1. Box-Cox Transformation
+        2. Yeo-Johnson Transformation
+    Box-Cox requires input data to be strictly positive, while Yeo-Johnson supports both positive or negative data.
+    '''
     def __init__(self, dataframe: pd.DataFrame, col: str) -> None:
         self.dataframe = dataframe
         self.col = col
@@ -134,9 +147,9 @@ class OutlierDetection:
             with open(f'../Model/outlier_detection_ecod.pickle', 'rb') as f:
                 clf = pickle.load(f)
         
-        return clf.decision_scores_ >= threshold
+        return clf.decision_function(self.dataframe) >= threshold
     
-    def suod(self, detector_list: list, threshold: int, train: bool, verbose: bool, combination='average',  n_jobs=-1) -> np.ndarray:
+    def suod(self, detector_list: list, threshold: int, train: bool, verbose: bool, n_jobs: int, combination='average') -> np.ndarray:
         if train:
             # decide the number of parallel process, and the combination method
             # then clf can be used as any outlier detection model
@@ -152,7 +165,7 @@ class OutlierDetection:
         else:
             with open(f'../Model/outlier_detection_suod.pickle', 'rb') as f:
                 clf = pickle.load(f)
-        
+                
         return clf.decision_function(self.dataframe) >= threshold
         
     def elliptic_envelope(self, random_state, train) -> np.ndarray:
@@ -189,7 +202,7 @@ class FeatureSelection:
         # return self.dataframe.loc[:, ~vt_selector.get_support()], self.dataframe.loc[:, vt_selector.get_support()]
     
     
-    def mutual_information(self, y, k, train) -> pd.DataFrame:
+    def mutual_information(self, k, train, y=None) -> pd.DataFrame:
         if train:
             select_best_k_feature = SelectKBest(
                 mutual_info_regression, k=k
@@ -206,6 +219,8 @@ class FeatureSelection:
     def importance_weight(self, y, estimator, train) -> pd.DataFrame:
         '''
         Meta-transformer for selecting features based on importance weights.
+        1. L1-based model: 只能一次做一個 Y(單一維度)
+        2. tree-based model: 可以支援多維度的 Y
         '''
         if train:
             estimator.fit(self.dataframe, y)
@@ -241,7 +256,7 @@ class FeatureSelection:
     
     
     
-class CreateGroupFeature:
+class CreateGroupFeatureFromAllCol:
     def __init__(self, dataframe: pd.DataFrame) -> None:
         self.dataframe = dataframe
     
@@ -255,7 +270,47 @@ class CreateGroupFeature:
             # scale the data
             scaler = standardization_dic[standardization]
             scaler.fit(self.dataframe)
-            with open(f'../Model/create_group_feature_by_kmeans_with_{standardization}.pickle', 'wb' ) as f:
+            with open(f'../Model/create_group_feature_from_all_column_by_kmeans_with_{standardization}.pickle', 'wb' ) as f:
+                pickle.dump(scaler, f)
+                
+            scaled_data = scaler.transform(self.dataframe)
+            best_k, results = kmeans_utils.choose_best_k_for_kmeans(
+                    scaled_data,
+                    k_range=k_range,
+                    verbose = parallel_verbose,
+                    parallel=parallel
+                )
+ 
+            kmeans = KMeans(n_clusters=best_k, random_state=random_state).fit(scaled_data)
+            with open(f'../Model/create_group_feature_from_all_column_by_kmeans.pickle', 'wb' ) as f:
+                pickle.dump(kmeans, f)
+
+        else:
+            with open(f'../Model/create_group_feature_from_all_column_by_kmeans_with_{standardization}.pickle', 'rb') as f:
+                scaler = pickle.load(f)
+            
+            with open(f'../Model/create_group_feature_from_all_column_by_kmeans.pickle', 'rb') as f:
+                kmeans = pickle.load(f)
+            
+        scaled_data = scaler.transform(self.dataframe)
+        return kmeans.predict(scaled_data)
+    
+    
+class CreateGroupFeatureFromEachCol:
+    def __init__(self, dataframe: pd.DataFrame) -> None:
+        self.dataframe = dataframe
+    
+    def kmeans_with_auto_k(self, standardization: str, k_range: range, random_state: int, parallel: bool, parallel_verbose: int, train: bool) -> np.ndarray:
+        standardization_dic = {
+            'min_max': MinMaxScaler(),
+            'zscore': StandardScaler()
+        }
+        
+        if train:
+            # scale the data
+            scaler = standardization_dic[standardization]
+            scaler.fit(self.dataframe)
+            with open(f'../Model/create_group_feature_from_each_column_by_kmeans_with_{standardization}.pickle', 'wb' ) as f:
                 pickle.dump(scaler, f)
                 
             scaled_data = scaler.transform(self.dataframe)
@@ -266,18 +321,20 @@ class CreateGroupFeature:
                     parallel=parallel
                 )         
             kmeans = KMeans(n_clusters=best_k, random_state=random_state).fit(scaled_data)
-            with open(f'../Model/create_group_feature_by_kmeans.pickle', 'wb' ) as f:
+            with open(f'../Model/create_group_feature_from_each_column_by_kmeans.pickle', 'wb' ) as f:
                 pickle.dump(kmeans, f)
 
         else:
-            with open(f'../Model/create_group_feature_by_kmeans_with_{standardization}.pickle', 'rb') as f:
+            with open(f'../Model/create_group_feature_from_each_column_by_kmeans_with_{standardization}.pickle', 'rb') as f:
                 scaler = pickle.load(f)
             
-            with open(f'../Model/create_group_feature_by_kmeans.pickle', 'rb') as f:
+            with open(f'../Model/create_group_feature_from_each_column_by_kmeans.pickle', 'rb') as f:
                 kmeans = pickle.load(f)
             
         scaled_data = scaler.transform(self.dataframe)
-        return kmeans.predict(scaled_data)
+        return kmeans.predict(scaled_data)    
+    
+    
     
     
 class GeneratePolynomialFeatures:
@@ -323,20 +380,22 @@ class ReduceDimensionPCA:
                 pca_model = pickle.load(f)
         
         return pca_model.transform(self.dataframe)
-    
-    
+
+
+
 class Standardization:
-    def __init__(self, dataframe) -> None:
+    def __init__(self, dataframe: pd.DataFrame, prefix: str) -> None:
         self.dataframe = dataframe
+        self.prefix = prefix
         
     def standard_scaler(self, train) -> pd.DataFrame:
         if train:
             scaler = preprocessing.StandardScaler()
             scaler.fit(self.dataframe._get_numeric_data().values) # returns a numpy array first
-            with open(f'../Model/standard_scaler.pickle', 'wb' ) as f:
+            with open(f'../Model/standard_scaler_{self.prefix}.pickle', 'wb' ) as f:
                 pickle.dump(scaler, f)
         else:
-            with open(f'../Model/standard_scaler.pickle', 'rb') as f:
+            with open(f'../Model/standard_scaler_{self.prefix}.pickle', 'rb') as f:
                 scaler = pickle.load(f)
                 
         data_scaled = scaler.transform(self.dataframe._get_numeric_data().values)
@@ -359,5 +418,3 @@ class Standardization:
         dataframe_copy = self.dataframe.copy()
         dataframe_copy[dataframe_copy._get_numeric_data().columns] = data_scaled
         return dataframe_copy
-    
-    
