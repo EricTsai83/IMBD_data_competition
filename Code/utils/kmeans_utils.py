@@ -2,7 +2,9 @@ import numpy as np
 from sklearn.cluster import KMeans
 from joblib import Parallel, delayed
 import pandas as pd
-
+import platform
+# warnings
+import warnings
 
 def kmeans_res(scaled_data, k, alpha_k=0.02):
     '''
@@ -43,15 +45,21 @@ def choose_best_k_for_kmeans(scaled_data, k_range, verbose, parallel=True):
     results: pandas DataFrame
         adjusted inertia value for each k in k_range
     '''
-    if parallel:  
-        ans = Parallel(n_jobs=-1, verbose=verbose)(delayed(kmeans_res)(scaled_data, k) for k in k_range)
+    if parallel:
+
+        if platform.system() == 'Darwin': # Darwin是一種類Unix作業系統(MacBook Pro: Apple M1 Pro 晶片)
+            ans = Parallel(n_jobs=4, verbose=verbose)(delayed(kmeans_res)(scaled_data, k) for k in k_range)
+        else:    
+            ans = Parallel(n_jobs=-1, verbose=verbose)(delayed(kmeans_res)(scaled_data, k) for k in k_range)
+
         ans = list(zip(k_range, ans))
         results = pd.DataFrame(ans, columns = ['k','Scaled Inertia']).set_index('k')
         best_k = results.idxmin()[0]
     else:
         ans = []
         for k in k_range:
-            scaled_inertia = kmeans_res(scaled_data, k)
+            with warnings.catch_warnings():
+                scaled_inertia = kmeans_res(scaled_data, k)
             ans.append((k, scaled_inertia))
         results = pd.DataFrame(ans, columns = ['k','Scaled Inertia']).set_index('k')
         best_k = results.idxmin()[0]
